@@ -3,7 +3,6 @@ using ArgumentParser.Variable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 
 namespace ArgumentParser.Parser
 {
@@ -22,6 +21,10 @@ namespace ArgumentParser.Parser
         {
             ///Add an argument to be parsed with default type String
             AddArgument(Name, StoresType.String, ShortName, Description);
+        }
+        public void AddArgument(string Name, string Description = null)
+        {
+            AddArgument(Name, StoresType.String, null, Description);
         }
         public void AddArgument(Argument arg)
         {
