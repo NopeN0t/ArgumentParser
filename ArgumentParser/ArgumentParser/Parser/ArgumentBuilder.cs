@@ -10,26 +10,30 @@ namespace ArgumentParser.Parser
     {
         //No remove method is provided, as the arguments are ment to be static and predefined.
         public List<Argument> args = new List<Argument>();
-        public void AddArgument(string Name, StoresType DataType, string ShortName = null, string Description = null)
+        public void AddArgument(string Name, StoresType DataType, string ShortName = null, string Description = null, string Default = null)
         {
             ///Add an argument to be parsed
-            if (args.Any(a => a.Name == Name && a.ShortName == ShortName && a.StoreType == DataType))
-                throw new ArgumentException($"Argument with name {Name} and short name {ShortName} already exists with type {DataType}");
-            args.Add(new Argument(Name, DataType, ShortName, Description));
+            ///Throws ArgumentException if an argument with the same name and short name already exists
+            if (args.Any(a => a.Name == Name && a.ShortName == ShortName)) //This allows short name to be null
+                throw new ArgumentException($"Argument with name {Name} and short name {ShortName} already exists");
+            args.Add(new Argument(Name, DataType, ShortName, Description, Default));
         }
         public void AddArgument(string Name, string ShortName = null, string Description = null)
         {
             ///Add an argument to be parsed with default type String
+            ///Throws ArgumentException if an argument with the same name and shortname already exists
             AddArgument(Name, StoresType.String, ShortName, Description);
         }
         public void AddArgument(string Name, string Description = null)
         {
+            ///Add an argument to be parsed with default type String
+            ///Throws ArgumentException if an argument with the same name already exists
             AddArgument(Name, StoresType.String, null, Description);
         }
         public void AddArgument(Argument arg)
         {
             ///Add an argument to be parsed
-            if (args.Any(a => a.Name == arg.Name && a.ShortName == arg.ShortName && a.StoreType == arg.StoreType))
+            if (args.Any(a => a.Name == arg.Name && a.ShortName == arg.ShortName))
                 throw new ArgumentException($"Argument with name {arg.Name} and short name {arg.ShortName} already exists with type {arg.StoreType}");
             args.Add(arg);
         }
