@@ -51,7 +51,7 @@ namespace ArgumentParser.Parser
         }
         public void Dispose()
         {
-            args.Clear();
+            args?.Clear();
             args = null;
         }
     }

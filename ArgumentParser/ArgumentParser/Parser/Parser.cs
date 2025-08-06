@@ -111,6 +111,7 @@ namespace ArgumentParser.Parser
         {
             ///Clean up the parser after parsing
             Builder?.Dispose();
+            Builder = null;
             Requried.Clear(); //If parsing failed
             Optional.Clear(); //If parsing failed
         }
