@@ -6,13 +6,15 @@ namespace Demo
 {
     internal class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
+
             //This simulate inputing from terminal
-            string[] args = { "-o", "Optional", "REQ_1", "-n" , "10", "REQ_2" };
-            
+            if (args.Length == 0)
+                args = new string[] { "-o", "Optional", "REQ_1", "-n", "10", "REQ_2" };
+
             //Show arguments
-            foreach(string arg in args)
+            foreach (string arg in args)
                 Console.Write(arg + " ");
             Console.Write("\n");
 
@@ -40,9 +42,9 @@ namespace Demo
             string req1 = (string)parser.ParsedValue["Req"];
             string req2 = (string)parser.ParsedValue["TEST2"];
             string opt = (string)parser.ParsedValue["--opt"];
-            int num = (int)parser.ParsedValue["--Num"];
+            int? num = (int?)parser.ParsedValue["--Num"];
             int? nullValue = (int?)parser.ParsedValue["--Null"]; //Will be null if not provided
-            float floatValue = (float)parser.ParsedValue["--Float"]; //Will be 3.14 if not provided
+            float? floatValue = (float?)parser.ParsedValue["--Float"]; //Will be 3.14 if not provided
             bool isTrue = (bool)parser.ParsedValue["--True"];
             //Note: Storing in other variables is optional, you can access them directly form parser.ParsedValue
             //But this way you can dispose of parser after doing so
