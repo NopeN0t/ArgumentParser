@@ -11,9 +11,13 @@ namespace ArgumentParser.Parser
     {
         public ArgumentBuilder Builder = new ArgumentBuilder();
         public Dictionary<string, object> ParsedValue = new Dictionary<string, object>();
-
+        
         private readonly List<Argument> Requried = new List<Argument>();
         private readonly List<Argument> Optional = new List<Argument>();
+        private readonly List<Argument> _Requried = new List<Argument>();
+        private readonly List<Argument> _Optional = new List<Argument>();
+
+        private bool IsPrepared = false;
 
         private string GenerateHelp(List<Argument> required, List<Argument> optional, bool FullHelp = true)
         {
@@ -42,11 +46,21 @@ namespace ArgumentParser.Parser
         }
         private void PrepareArguments()
         {
+            if (IsPrepared)
+                return;
             foreach (var arg in Builder.args) //Seperate required and optional arguments
                 if (arg.IsRequired)
                     Requried.Add(arg);
                 else
                     Optional.Add(arg);
+            IsPrepared = true;
+        }
+        private void MakeDupeArgs()
+        {
+            foreach (var arg in Requried)
+                _Requried.Add(arg);
+            foreach (var arg in Optional)
+                _Optional.Add(arg);
         }
         private object ParseValue(string value, StoresType type)
         {
@@ -73,8 +87,8 @@ namespace ArgumentParser.Parser
         }
         private void ParseRemains()
         {
-            if (Optional.Count > 0)
-                foreach (var arg in Optional)
+            if (_Optional.Count > 0)
+                foreach (var arg in _Optional)
                 {
                     if (arg.StoreType != StoresType.Boolean) //Cursed Parsing method
                         try { ParsedValue[arg.Name] = ParseValue(arg.DefultValue, arg.StoreType); }
@@ -94,7 +108,7 @@ namespace ArgumentParser.Parser
                 ParsedValue[argument.Name] = ParseValue(args[i + 1], argument.StoreType);
                 i++;
             }
-            Optional.Remove(argument); //Remove after parsing
+            _Optional.Remove(argument); //Remove after parsing
         }
         private void ParseRequriedArgument(ref string[] args, ref int i)
         {
@@ -102,9 +116,9 @@ namespace ArgumentParser.Parser
             //Idea parse value in order of requried arguments
             //What comes first gets parsed first then removed from the list
 
-            Argument argument = Requried.First(); //Get first required argument
+            Argument argument = _Requried.First(); //Get first required argument
             ParsedValue[argument.Name] = ParseValue(args[i], argument.StoreType); //Parse the value
-            Requried.RemoveAt(0); //Remove the first required argument
+            _Requried.RemoveAt(0); //Remove the first required argument
             //Queue is not used because of generating help text
         }
         private void CleanUp()
@@ -120,7 +134,8 @@ namespace ArgumentParser.Parser
         {
             ///Parse the arguments
             ///returns true if parsing was successful, false otherwise
-            PrepareArguments();
+            PrepareArguments(); //Seperates Arguments
+            MakeDupeArgs(); //We process duplicates of the argument so other function won't be affected
             if (args.Contains("-h") || args.Contains("--help"))
             {
                 // Display help information and end process
@@ -134,15 +149,15 @@ namespace ArgumentParser.Parser
                 for (int i = 0; i < args.Length; i++) //Consume Arguments from left to right
                 {
                     var argument = Builder.GetArgument(args[i]);
-                    if (Optional.Contains(argument)) //Handles Optional Arguments
+                    if (_Optional.Contains(argument)) //Handles Optional Arguments
                         ParseOptionalArgument(ref argument, ref args, ref i); //OOP moment
-                    else if (Requried.Count != 0)
+                    else if (_Requried.Count != 0)
                         ParseRequriedArgument(ref args, ref i); //Handles Requried Arguments
                     else 
                         Console.WriteLine($"Unknown argument: {args[i]} Skipping...");
                 }
                 ParseRemains(); //Remaining optional arguments uses default values
-                if (Requried.Count > 0) //If there are still required arguments left
+                if (_Requried.Count > 0) //If there are still required arguments left
                 {
                     Console.WriteLine("Not all required arguments were provided.");
                     Console.WriteLine(GenerateHelp(Requried, Optional, false));
