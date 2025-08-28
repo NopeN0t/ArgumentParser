@@ -1,17 +1,28 @@
 ﻿using ArgumentParser.Enums;
+using ArgumentParser.Interfrace;
 using ArgumentParser.Variable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using ArgumentParser.HelpGenerator;
 
 namespace ArgumentParser.Parser
 {
     public class Parser : IDisposable
     {
-        public ArgumentBuilder Builder = new ArgumentBuilder();
+        public Parser(IHelpMaker HelpGenerator = null)
+        {
+            if (HelpGenerator == null)
+                HelpGenerator = new DefaultHelpMaker();
+            this.Help = HelpGenerator;
+        }
+
+        public ArgumentBuilder Builder = new ArgumentBuilder();     //Builder is Immediately disposed after parsing
+        public IHelpMaker Help;                                      //Help must be disposed manually or with parser itself
         public Dictionary<string, object> ParsedValue = new Dictionary<string, object>();
-        
+
+        //---------------------Arguments---------------------//
+        //This is needed due to parsing method
         private readonly List<Argument> Requried = new List<Argument>();
         private readonly List<Argument> Optional = new List<Argument>();
         private readonly List<Argument> _Requried = new List<Argument>();
@@ -19,31 +30,7 @@ namespace ArgumentParser.Parser
 
         private bool IsPrepared = false;
 
-        private string GenerateHelp(List<Argument> required, List<Argument> optional, bool FullHelp = true)
-        {
-            ///Generate help text for the arguments
-            ///returns help text as string
-            StringBuilder sb = new StringBuilder();
-            //Short help
-            sb.Append("Available arguments : [-h]");
-            foreach (var arg in optional)
-                sb.Append($" [{arg.ShortName}]");
-            foreach (var arg in required)
-                sb.Append($" {arg.Name}");
-
-            //Detailed help
-            if (FullHelp)
-            {
-                sb.AppendLine("\n\nRequired arguments:");
-                foreach (var arg in required)
-                    sb.AppendLine($"  {arg.Name}\t{arg.Description} [{arg.StoreType}]");
-                sb.AppendLine("\nOptional arguments:");
-                foreach (var arg in optional)
-                    sb.AppendLine($"  {arg.ShortName}, {arg.Name}\t{arg.Description} [{arg.StoreType}]");
-                // Add detailed help for each argument
-            }
-            return sb.ToString();
-        }
+        //---------------------Interal---------------------//
         private void PrepareArguments()
         {
             if (IsPrepared)
@@ -126,11 +113,13 @@ namespace ArgumentParser.Parser
             ///Clean up the parser after parsing
             Builder?.Dispose();
             Builder = null;
+            Help = null;
             Requried.Clear(); //If parsing failed
             Optional.Clear(); //If parsing failed
         }
 
-        public bool ParseArguments(string[] args)
+        //---------------------Public---------------------//
+        public bool ParseArguments(string[] args, bool IgnoreUnknown = true)
         {
             ///Parse the arguments
             ///returns true if parsing was successful, false otherwise
@@ -139,7 +128,7 @@ namespace ArgumentParser.Parser
             if (args.Contains("-h") || args.Contains("--help"))
             {
                 // Display help information and end process
-                Console.WriteLine(GenerateHelp(Requried, Optional));
+                Console.WriteLine(Help.GenerateHelp(Requried, Optional, true));
                 CleanUp();
                 return false;
             }
@@ -153,23 +142,19 @@ namespace ArgumentParser.Parser
                         ParseOptionalArgument(ref argument, ref args, ref i); //OOP moment
                     else if (_Requried.Count != 0)
                         ParseRequriedArgument(ref args, ref i); //Handles Requried Arguments
-                    else 
+                    else
+                        if (!IgnoreUnknown)
                         Console.WriteLine($"Unknown argument: {args[i]} Skipping...");
                 }
                 ParseRemains(); //Remaining optional arguments uses default values
                 if (_Requried.Count > 0) //If there are still required arguments left
-                {
-                    Console.WriteLine("Not all required arguments were provided.");
-                    Console.WriteLine(GenerateHelp(Requried, Optional, false));
-                    CleanUp();
-                    return false;
-                }
+                    throw new ArgumentException("Not all requried arguments are provided");
                 return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Error parsing arguments {e.Message}");
-                Console.WriteLine(GenerateHelp(Requried, Optional, false));
+                Console.WriteLine(Help.GenerateHelp(Requried, Optional, false));
                 CleanUp();
                 return false;
             }
@@ -177,6 +162,7 @@ namespace ArgumentParser.Parser
         public void Dispose()
         {
             ///Dispose of the parser
+            Help = null;
             Builder?.Dispose();
             ParsedValue?.Clear();
             Requried.Clear();

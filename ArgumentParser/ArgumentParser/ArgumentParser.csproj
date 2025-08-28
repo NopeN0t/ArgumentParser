@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums\StoresType.cs" />
+    <Compile Include="HelpGenerator\DefaultHelpMaker.cs" />
+    <Compile Include="Abstract\IHelpMaker.cs" />
     <Compile Include="Parser\ArgumentBuilder.cs" />
     <Compile Include="Parser\Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

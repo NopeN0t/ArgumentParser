@@ -1,4 +1,5 @@
 ﻿using ArgumentParser.Enums;
+using ArgumentParser.HelpGenerator;
 using ArgumentParser.Parser;
 using System;
 
@@ -17,8 +18,8 @@ namespace Demo
             foreach (string arg in args)
                 Console.Write(arg + " ");
             Console.Write("\n");
-
-            Parser parser = new Parser(); //Python style arguments (Not all feature included)
+                                        //Default help generator is used even not specficed
+            Parser parser = new Parser(HelpGenerator: new DefaultHelpMaker()); //Python style arguments (Not all feature included)
             //Multi input arguments are not supported
             //Eg. (Req) Path1 Parh2 Path3
             parser.Builder.AddArgument("Req", "This is a required argument");
@@ -31,6 +32,13 @@ namespace Demo
             //The builder is disposed after parsing
             if (!parser.ParseArguments(args))
                 return; //If parsing failed terminate program
+
+            //Theoretically you can cain abunch of parser for more complex program
+            //if (parser.ParsedValue(""))
+            //Parser parser2 = new Parser();
+            //Whatever 
+
+
             //Manual mode can be added as backup if you don't want to just terminate program
             //In this case it is recommended to extract values from parser.ParsedValue to local variables and dispose of parser
 
