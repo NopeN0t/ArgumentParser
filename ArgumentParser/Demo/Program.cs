@@ -38,9 +38,12 @@ namespace Demo
             //Parser parser2 = new Parser();
             //Whatever 
 
-
             //Manual mode can be added as backup if you don't want to just terminate program
             //In this case it is recommended to extract values from parser.ParsedValue to local variables and dispose of parser
+            //If manual mode is inculed you can check like this
+            if (parser.IsManualHelp)
+                return; //Exit if user call -h (If you have manual fallback)
+
 
             Console.WriteLine();
             foreach (var x in parser.ParsedValue.Keys) //Show all parsed values

@@ -20,6 +20,7 @@ namespace ArgumentParser.Parser
         public ArgumentBuilder Builder = new ArgumentBuilder();     //Builder is Immediately disposed after parsing
         public IHelpMaker Help;                                      //Help must be disposed manually or with parser itself
         public Dictionary<string, object> ParsedValue = new Dictionary<string, object>();
+        public bool IsManualHelp = false;
 
         //---------------------Arguments---------------------//
         //This is needed due to parsing method
@@ -130,6 +131,7 @@ namespace ArgumentParser.Parser
                 // Display help information and end process
                 Console.WriteLine(Help.GenerateHelp(Requried, Optional, true));
                 CleanUp();
+                IsManualHelp = true;
                 return false;
             }
 
