@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ArgumentParser\ArgumentParser.csproj">
-      <Project>{89d33668-7502-4baf-a2f8-5a0680619d76}</Project>
+      <Project>{9277c287-14e0-418d-8f72-eb9576b0dd18}</Project>
       <Name>ArgumentParser</Name>
     </ProjectReference>
   </ItemGroup>

@@ -1,7 +1,7 @@
 ﻿using ArgumentParser.Variable;
 using System.Collections.Generic;
 
-namespace ArgumentParser.Interfrace
+namespace ArgumentParser.Interface
 {
     public interface IHelpMaker
     {

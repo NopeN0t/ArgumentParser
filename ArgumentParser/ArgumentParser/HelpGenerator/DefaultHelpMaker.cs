@@ -1,4 +1,4 @@
-﻿using ArgumentParser.Interfrace;
+﻿using ArgumentParser.Interface;
 using ArgumentParser.Variable;
 using System.Collections.Generic;
 using System.Text;

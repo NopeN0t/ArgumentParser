@@ -1,10 +1,10 @@
 ﻿using ArgumentParser.Enums;
-using ArgumentParser.Interfrace;
 using ArgumentParser.Variable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using ArgumentParser.HelpGenerator;
+using ArgumentParser.Interface;
 
 namespace ArgumentParser.Parser
 {
